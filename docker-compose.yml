@@ -1,0 +1,46 @@
+# PostgreSQL + FastAPI для локальной разработки.
+# Перед запуском: cp .env.example .env и задайте SECRET_KEY.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-theater}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-theater}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required: copy .env.example to .env and set a random value}
+      ALGORITHM: ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      SCENARIO_TZ_UPLOAD_ROOT: /app/data/scenario_tz
+      N8N_TZ_WEBHOOK_URL: ${N8N_TZ_WEBHOOK_URL:-}
+      N8N_TZ_TIMEOUT_SEC: ${N8N_TZ_TIMEOUT_SEC:-120}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - scenario_tz:/app/data/scenario_tz
+
+volumes:
+  pgdata: {}
+  scenario_tz: {}

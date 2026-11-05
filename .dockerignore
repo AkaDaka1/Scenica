@@ -1,0 +1,41 @@
+# Git и локальные файлы
+.git
+.gitignore
+.gitattributes
+
+# Секреты и локальная конфигурация
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jks
+*.keystore
+
+# Python
+__pycache__
+*.py[cod]
+*.egg-info
+.venv
+venv
+env
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov
+
+# Тесты, документация и клиенты не нужны внутри API-образа
+tests
+docs
+android-client
+README.md
+CONTRIBUTING.md
+SECURITY.md
+
+# Локальные данные и логи
+data
+*.log
+*.db
+*.sqlite
+*.sqlite3
